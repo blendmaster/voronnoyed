@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang=en>
+<meta charset=utf-8>
+<title>Voronnoyed: The Happening</title>
+
+<style>
+  input:not(:disabled), button, label { cursor: pointer }
+  #canvas { cursor: pointer }
+</style>
+
+<h1>Voronnoyed</h1>
+
+<p>Status: ☐ Not happening ☑ Happening
+
+<div id=controls>
+  <p>Colors:
+     <label><input type=radio name=colors id=random checked>Random</label>
+     <label><input type=radio name=colors id=img           >Mosaic</label>
+     (Image: <input type=file id=image>)
+  <p><button id=add>Add More Points</button>
+     <button id=reset>Reset</button>
+     , Sites:
+     <label><input type=radio name=points id=show checked>Show</label>
+     <label><input type=radio name=points id=Hide        >Hide</label>
+     , Animation:
+     <label><input type=radio name=anim id=animate        >Yes</label>
+     <label><input type=radio name=anim id=static  checked>No</label>
+     , Detail:
+     <input id=detail type=number min=4 max=250 step=5 value=250 maxlength=3 size=3>
+     Triangles Per Cone
+</div>
+
+<div>
+  <canvas id=canvas width=500 height=500>
+    Oh gosh, your browser doesn't support canvas ;_;
+  </canvas>
+</div>
+
+<footer>
+  <small>
+    &copy; 2012 Steven Ruppert. You can also view
+    <a href=https://github.com/blendmaster/voronnoyed>voronnoyed on Github</a>.
+  </small>
+</footer>
+
+<script src=webgl-debug.js></script>
+<script src=gl-matrix-min.js></script>
+<script src=utils.js></script>
+<script src=programs.js></script>
+<script src=voronnoyed.js></script>
+

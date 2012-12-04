@@ -1,0 +1,32 @@
+# Voronnoyed GLSL programs
+# Author: Steven Ruppert
+# For the Fall 2012 CSCI441 Graphics class at Colorado School of Mines
+
+# this comment appears in the compiled source:
+/* This file (programs.js) is compiled from programs.co. Please view the
+original commented source there. */
+
+"use strict"
+
+programs = {}
+
+export load = (it, gl) -> programs[it] gl
+
+programs.voronoi = shader-program do
+  vertex: """
+    precision mediump float;
+
+    void main() {
+      gl_Position = vec4(0, 0, 0, 0);
+    }
+  """
+  fragment: """
+    precision mediump float;
+
+    void main() {
+      gl_FragColor = vec4(0, 0, 0, 0);
+    }
+    """
+  # uniforms:
+
+
