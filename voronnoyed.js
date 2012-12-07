@@ -27,7 +27,7 @@ original commented source there. */
   load('voronoi', gl);
   function makeHat(){
     var detail, x$, i, t, step$, to$;
-    detail = Math.max(4, parseInt($('detail').value, 10) || 200);
+    detail = Math.max(3, parseInt($('detail').value, 10) || 200);
     console.log("detail: " + detail);
     x$ = hat = new Float32Array((2 + detail) * 3);
     x$[0] = 0;
@@ -116,4 +116,5 @@ original commented source there. */
   if ($('animate').checked) {
     animation = requestAnimationFrame(move);
   }
+  $('detail').addEventListener('input', makeHat);
 }).call(this);

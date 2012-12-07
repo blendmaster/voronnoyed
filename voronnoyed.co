@@ -35,7 +35,7 @@ load \voronoi gl
 
 var hat, hat-buffer
 !function make-hat
-  detail = Math.max 4, (parseInt ($ \detail .value), 10 or 200)
+  detail = Math.max 3, (parseInt ($ \detail .value), 10 or 200)
   console.log "detail: #detail"
 
   hat := new Float32Array (2 + detail) * 3
@@ -135,3 +135,4 @@ $ \static .addEventListener \click !-> clearTimeout animation
 if $ \animate .checked
   animation := requestAnimationFrame move
 
+$ \detail .addEventListener \input make-hat
