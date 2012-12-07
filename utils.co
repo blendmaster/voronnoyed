@@ -104,3 +104,16 @@ export bind-buffer = (gl, name, value, element-length) ->
 
 export rand = (a, b) -> Math.random! * (b - a) + a
 
+# lazy requestanimframe polyfill
+
+if requestAnimationFrame!?
+  for <[ms moz webkit o]>
+    if window"#&requestAnimationFrame"
+      window.requestAnimationFrame = window"#&requestAnimationFrame"
+      window.cancelAnimationFrame = window"#&cancelAnimationFrame"
+
+if requestAnimationFrame!?
+  window.requestAnimationFrame = -> setTimeout it, 1000/60
+  window.cancelAnimationFrame = clearTimeout
+
+

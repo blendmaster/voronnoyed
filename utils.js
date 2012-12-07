@@ -2,7 +2,7 @@
 original commented source there. */
 (function(){
   "use strict";
-  var log, degrees, radians, $, readPpm, shaderProgram, defer, reading, uniform, bindBuffer, rand, out$ = typeof exports != 'undefined' && exports || this, slice$ = [].slice;
+  var log, degrees, radians, $, readPpm, shaderProgram, defer, reading, uniform, bindBuffer, rand, i$, x$, ref$, len$, out$ = typeof exports != 'undefined' && exports || this, slice$ = [].slice;
   mat4.translation = function(translation){
     return mat4.translate(mat4.identity(), translation);
   };
@@ -105,4 +105,19 @@ original commented source there. */
   out$.rand = rand = function(a, b){
     return Math.random() * (b - a) + a;
   };
+  if (typeof requestAnimationFrame == 'undefined' || requestAnimationFrame === null) {
+    for (i$ = 0, len$ = (ref$ = ['ms', 'moz', 'webkit', 'o']).length; i$ < len$; ++i$) {
+      x$ = ref$[i$];
+      if (window[x$ + "requestAnimationFrame"]) {
+        window.requestAnimationFrame = window[x$ + "requestAnimationFrame"];
+        window.cancelAnimationFrame = window[x$ + "cancelAnimationFrame"];
+      }
+    }
+  }
+  if (typeof requestAnimationFrame == 'undefined' || requestAnimationFrame === null) {
+    window.requestAnimationFrame = function(it){
+      return setTimeout(it, 1000 / 60);
+    };
+    window.cancelAnimationFrame = clearTimeout;
+  }
 }).call(this);

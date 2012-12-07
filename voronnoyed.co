@@ -58,7 +58,7 @@ export points = []
     points.push do
       pos: [rand(-1 1), rand(-1 1)]
       color: [rand(0 1), rand(0 1), rand(0 1)]
-      velocity: rand 0 1
+      velocity: rand -1 1
   draw!
 
 overlay = $ \overlay
@@ -105,7 +105,7 @@ $ \overlay .addEventListener \click !({clientX, clientY}) ->
       * (clientX - left) / width * 2 - 1
       * -((clientY - top) / height * 2 - 1)
     color: [rand(0 1), rand(0 1), rand(0 1)]
-    velocity: rand 0 1
+    velocity: rand -1 1
   draw!
 
 $ \reset .addEventListener \click !->
@@ -116,4 +116,22 @@ $ \add .addEventListener \click !-> add-points points.length
 
 $ \show .addEventListener \click draw
 $ \hide .addEventListener \click draw
+
+var animation
+!function move
+  for points
+    radius = Math.sqrt(&pos.0**2 + &pos.1**2)
+    angle = radians(&velocity * (2 - radius)) + Math.atan2 &pos.1, &pos.0
+    &pos = [radius * Math.cos(angle), radius * Math.sin(angle)]
+
+  draw!
+
+  if $ \animate .checked
+    animation := requestAnimationFrame move
+
+$ \animate .addEventListener \click move
+$ \static .addEventListener \click !-> clearTimeout animation
+
+if $ \animate .checked
+  animation := requestAnimationFrame move
 

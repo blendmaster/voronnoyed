@@ -2,7 +2,7 @@
 original commented source there. */
 (function(){
   "use strict";
-  var canvas, width, height, k, ref$, v, x$, hat, hatBuffer, points, overlay, ctx, draw, out$ = typeof exports != 'undefined' && exports || this;
+  var canvas, width, height, k, ref$, v, x$, hat, hatBuffer, points, overlay, ctx, draw, animation, out$ = typeof exports != 'undefined' && exports || this;
   canvas = $('canvas');
   width = canvas.width, height = canvas.height;
   try {
@@ -49,7 +49,7 @@ original commented source there. */
       points.push({
         pos: [rand(-1, 1), rand(-1, 1)],
         color: [rand(0, 1), rand(0, 1), rand(0, 1)],
-        velocity: rand(0, 1)
+        velocity: rand(-1, 1)
       });
     }
     draw();
@@ -83,7 +83,7 @@ original commented source there. */
     points.push({
       pos: [(clientX - left) / width * 2 - 1, -((clientY - top) / height * 2 - 1)],
       color: [rand(0, 1), rand(0, 1), rand(0, 1)],
-      velocity: rand(0, 1)
+      velocity: rand(-1, 1)
     });
     draw();
   });
@@ -96,4 +96,24 @@ original commented source there. */
   });
   $('show').addEventListener('click', draw);
   $('hide').addEventListener('click', draw);
+  function move(){
+    var i$, x$, ref$, len$, radius, angle;
+    for (i$ = 0, len$ = (ref$ = points).length; i$ < len$; ++i$) {
+      x$ = ref$[i$];
+      radius = Math.sqrt(Math.pow(x$.pos[0], 2) + Math.pow(x$.pos[1], 2));
+      angle = radians(x$.velocity * (2 - radius)) + Math.atan2(x$.pos[1], x$.pos[0]);
+      x$.pos = [radius * Math.cos(angle), radius * Math.sin(angle)];
+    }
+    draw();
+    if ($('animate').checked) {
+      animation = requestAnimationFrame(move);
+    }
+  }
+  $('animate').addEventListener('click', move);
+  $('static').addEventListener('click', function(){
+    clearTimeout(animation);
+  });
+  if ($('animate').checked) {
+    animation = requestAnimationFrame(move);
+  }
 }).call(this);
