@@ -2,7 +2,7 @@
 original commented source there. */
 (function(){
   "use strict";
-  var canvas, width, height, k, ref$, v, x$, hat, hatBuffer, points, ctx, draw, out$ = typeof exports != 'undefined' && exports || this;
+  var canvas, width, height, k, ref$, v, x$, hat, hatBuffer, points, overlay, ctx, draw, out$ = typeof exports != 'undefined' && exports || this;
   canvas = $('canvas');
   width = canvas.width, height = canvas.height;
   try {
@@ -48,16 +48,19 @@ original commented source there. */
     for (i = 0; i < it; ++i) {
       points.push({
         pos: [rand(-1, 1), rand(-1, 1)],
-        color: [rand(0, 1), rand(0, 1), rand(0, 1)]
+        color: [rand(0, 1), rand(0, 1), rand(0, 1)],
+        velocity: rand(0, 1)
       });
     }
     draw();
   }
-  ctx = $('overlay').getContext('2d');
+  overlay = $('overlay');
+  ctx = overlay.getContext('2d');
   ctx.fillStyle = 'black';
   out$.draw = draw = function(){
     var i$, x$, ref$, len$;
     gl.clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
+    overlay.width = width;
     gl.bindBuffer(ARRAY_BUFFER, hatBuffer);
     for (i$ = 0, len$ = (ref$ = points).length; i$ < len$; ++i$) {
       x$ = ref$[i$];
@@ -71,4 +74,22 @@ original commented source there. */
   };
   addPoints(32);
   reading('image', 'AsText', function(){});
+  $('overlay').addEventListener('click', function(arg$){
+    var clientX, clientY, ref$, left, top;
+    clientX = arg$.clientX, clientY = arg$.clientY;
+    ref$ = this.getBoundingClientRect(), left = ref$.left, top = ref$.top;
+    points.push({
+      pos: [(clientX - left) / width * 2 - 1, -((clientY - top) / height * 2 - 1)],
+      color: [rand(0, 1), rand(0, 1), rand(0, 1)],
+      velocity: rand(0, 1)
+    });
+    draw();
+  });
+  $('reset').addEventListener('click', function(){
+    points = [];
+    addPoints(32);
+  });
+  $('add').addEventListener('click', function(){
+    addPoints(points.length);
+  });
 }).call(this);

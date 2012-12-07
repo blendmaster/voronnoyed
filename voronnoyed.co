@@ -58,14 +58,16 @@ export points = []
     points.push do
       pos: [rand(-1 1), rand(-1 1)]
       color: [rand(0 1), rand(0 1), rand(0 1)]
+      velocity: rand 0 1
   draw!
 
-
-ctx = $ \overlay .getContext \2d
+overlay = $ \overlay
+ctx = overlay.getContext \2d
 ctx.fillStyle = \black
 
 export draw = !->
   gl.clear COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT
+  overlay.width = width
 
   gl.bindBuffer ARRAY_BUFFER, hat-buffer
 
@@ -94,4 +96,21 @@ add-points 32
 
 reading \image \AsText !->
   # TODO
+
+$ \overlay .addEventListener \click !({clientX, clientY}) ->
+  {left, top} = @getBoundingClientRect!
+
+  points.push do
+    pos:
+      * (clientX - left) / width * 2 - 1
+      * -((clientY - top) / height * 2 - 1)
+    color: [rand(0 1), rand(0 1), rand(0 1)]
+    velocity: rand 0 1
+  draw!
+
+$ \reset .addEventListener \click !->
+  points := []
+  add-points 32
+
+$ \add .addEventListener \click !-> add-points points.length
 
