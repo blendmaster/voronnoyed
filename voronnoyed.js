@@ -67,9 +67,11 @@ original commented source there. */
       uniform(gl, 'transform', 'Matrix4fv', mat4.translate(mat4.identity(), [x$.pos[0], x$.pos[1], 0]));
       gl.uniform3f(gl.getUniformLocation(gl.program, 'color'), x$.color[0], x$.color[1], x$.color[2]);
       gl.drawArrays(TRIANGLE_FAN, 0, hat.length / 3);
-      ctx.beginPath();
-      ctx.arc(width / 2 * x$.pos[0] + width / 2, height / 2 * -x$.pos[1] + height / 2, 3, 0, 2 * Math.PI);
-      ctx.fill();
+      if ($('show').checked) {
+        ctx.beginPath();
+        ctx.arc(width / 2 * x$.pos[0] + width / 2, height / 2 * -x$.pos[1] + height / 2, 3, 0, 2 * Math.PI);
+        ctx.fill();
+      }
     }
   };
   addPoints(32);
@@ -92,4 +94,6 @@ original commented source there. */
   $('add').addEventListener('click', function(){
     addPoints(points.length);
   });
+  $('show').addEventListener('click', draw);
+  $('hide').addEventListener('click', draw);
 }).call(this);

@@ -84,13 +84,13 @@ export draw = !->
 
     gl.drawArrays TRIANGLE_FAN, 0, hat.length/3
 
-    # site
-    ctx.beginPath!
-    ctx.arc do
-      width/2 * &pos.0 + width/2
-      height/2 * -&pos.1 + height/2
-      3 0 2 * Math.PI
-    ctx.fill!
+    if $ \show .checked
+      ctx.beginPath!
+      ctx.arc do
+        width/2 * &pos.0 + width/2
+        height/2 * -&pos.1 + height/2
+        3 0 2 * Math.PI
+      ctx.fill!
 
 add-points 32
 
@@ -113,4 +113,7 @@ $ \reset .addEventListener \click !->
   add-points 32
 
 $ \add .addEventListener \click !-> add-points points.length
+
+$ \show .addEventListener \click draw
+$ \hide .addEventListener \click draw
 
