@@ -8,7 +8,7 @@ original commented source there. */
 
 "use strict"
 
-canvas = document.getElementById \canvas
+canvas = $ \canvas
 {width, height} = canvas
 
 try
