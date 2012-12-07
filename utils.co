@@ -37,7 +37,7 @@ export read-ppm = (gl, it) ->
 
 # from vertex and fragment glsl source, a function that attaches the program
 # and runs initialization code provided
-export shader-program = ({vertex, fragment, uniforms ? {}}) -> (gl) ->
+export shader-program = ({vertex, fragment, uniforms ? {}}) -> !(gl) ->
   vertex-shader = gl.createShader gl.VERTEX_SHADER
     gl.shaderSource (&), vertex
     gl.compileShader (&)
@@ -101,4 +101,6 @@ export bind-buffer = (gl, name, value, element-length) ->
       gl.vertexAttribPointer (&), element-length, gl.FLOAT, false 0 0
 
   return buf
+
+export rand = (a, b) -> Math.random! * (b - a) + a
 

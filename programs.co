@@ -14,17 +14,21 @@ export load = (it, gl) -> programs[it] gl
 
 programs.voronoi = shader-program do
   vertex: """
-    precision mediump float;
+    attribute vec3 coord;
+
+    uniform mat4 transform;
 
     void main() {
-      gl_Position = vec4(0, 0, 0, 0);
+      gl_Position = transform * vec4(coord, 1);
     }
   """
   fragment: """
     precision mediump float;
 
+    uniform vec3 color;
+
     void main() {
-      gl_FragColor = vec4(0, 0, 0, 0);
+      gl_FragColor = vec4(color, 1);
     }
     """
   # uniforms:

@@ -8,7 +8,7 @@ original commented source there. */
     return programs[it](gl);
   };
   programs.voronoi = shaderProgram({
-    vertex: "precision mediump float;\n\nvoid main() {\n  gl_Position = vec4(0, 0, 0, 0);\n}",
-    fragment: "precision mediump float;\n\nvoid main() {\n  gl_FragColor = vec4(0, 0, 0, 0);\n}"
+    vertex: "attribute vec3 coord;\n\nuniform mat4 transform;\n\nvoid main() {\n  gl_Position = transform * vec4(coord, 1);\n}",
+    fragment: "precision mediump float;\n\nuniform vec3 color;\n\nvoid main() {\n  gl_FragColor = vec4(color, 1);\n}"
   });
 }).call(this);

@@ -2,7 +2,7 @@
 original commented source there. */
 (function(){
   "use strict";
-  var log, degrees, radians, $, readPpm, shaderProgram, defer, reading, uniform, bindBuffer, out$ = typeof exports != 'undefined' && exports || this, slice$ = [].slice;
+  var log, degrees, radians, $, readPpm, shaderProgram, defer, reading, uniform, bindBuffer, rand, out$ = typeof exports != 'undefined' && exports || this, slice$ = [].slice;
   mat4.translation = function(translation){
     return mat4.translate(mat4.identity(), translation);
   };
@@ -41,7 +41,7 @@ original commented source there. */
       ? ref$
       : {};
     return function(gl){
-      var x$, vertexShader, y$, fragmentShader, z$, program, name, ref$, ref1$, type, value, results$ = [];
+      var x$, vertexShader, y$, fragmentShader, z$, program, name, ref$, ref1$, type, value;
       x$ = vertexShader = gl.createShader(gl.VERTEX_SHADER);
       gl.shaderSource(x$, vertex);
       gl.compileShader(x$);
@@ -65,9 +65,8 @@ original commented source there. */
       gl.useProgram(program);
       for (name in ref$ = uniforms) {
         ref1$ = ref$[name], type = ref1$[0], value = slice$.call(ref1$, 1);
-        results$.push(gl["uniform" + type].apply(gl, [gl.getUniformLocation(program, name)].concat(value)));
+        gl["uniform" + type].apply(gl, [gl.getUniformLocation(program, name)].concat(value));
       }
-      return results$;
     };
   };
   out$.defer = defer = function(t, fn){
@@ -102,5 +101,8 @@ original commented source there. */
     gl.enableVertexAttribArray(y$);
     gl.vertexAttribPointer(y$, elementLength, gl.FLOAT, false, 0, 0);
     return buf;
+  };
+  out$.rand = rand = function(a, b){
+    return Math.random() * (b - a) + a;
   };
 }).call(this);

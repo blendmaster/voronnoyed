@@ -5,7 +5,8 @@
 
 <style>
   input:not(:disabled), button, label { cursor: pointer }
-  #canvas { cursor: pointer }
+  #canvases { position: relative; }
+  #overlay { cursor: pointer; position: absolute; left: 0; top: 0; }
 </style>
 
 <h1>Voronnoyed</h1>
@@ -30,10 +31,11 @@
      Triangles Per Cone
 </div>
 
-<div>
+<div id=canvases>
   <canvas id=canvas width=500 height=500>
     Oh gosh, your browser doesn't support canvas ;_;
   </canvas>
+  <canvas id=overlay width=500 height=500></canvas>
 </div>
 
 <footer>

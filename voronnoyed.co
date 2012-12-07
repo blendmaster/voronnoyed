@@ -31,10 +31,66 @@ gl
   &clearColor 0 0 0 1 # black
   &clear      COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT
 
+load \voronoi gl
+
+var hat, hat-buffer
+!function make-hat
+  detail = Math.max 4, (parseInt ($ \detail .value), 10 or 200)
+  console.log "detail: #detail"
+
+  hat := new Float32Array (2 + detail) * 3
+    &0 = 0 ; &1 = 0 ; &2 = 0
+
+    i = 2
+    for t to Math.PI * 2 + 0.01 by Math.PI * 2 / detail
+      &[++i] = 2 * Math.cos t
+      &[++i] = 2 * Math.sin t
+      &[++i] = 1
+
+  hat-buffer := bind-buffer gl, \coord, hat, 3
+
+make-hat!
+
+export points = []
+
+!function add-points
+  for i til it
+    points.push do
+      pos: [rand(-1 1), rand(-1 1)]
+      color: [rand(0 1), rand(0 1), rand(0 1)]
+  draw!
+
+
+ctx = $ \overlay .getContext \2d
+ctx.fillStyle = \black
+
 export draw = !->
   gl.clear COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT
 
-  # TODO
+  gl.bindBuffer ARRAY_BUFFER, hat-buffer
+
+  for points
+    uniform gl, \transform, \Matrix4fv, mat4.translate do
+      mat4.identity!
+      [&pos.0, &pos.1, 0]
+
+    # XXX can't for the life of me figure out why gl.uniform3fv doesn't work here
+    # it throws "could not convert javascript argument"
+    gl.uniform3f do
+      gl.getUniformLocation gl.program, \color
+      &color.0, &color.1, &color.2
+
+    gl.drawArrays TRIANGLE_FAN, 0, hat.length/3
+
+    # site
+    ctx.beginPath!
+    ctx.arc do
+      width/2 * &pos.0 + width/2
+      height/2 * -&pos.1 + height/2
+      3 0 2 * Math.PI
+    ctx.fill!
+
+add-points 32
 
 reading \image \AsText !->
   # TODO
