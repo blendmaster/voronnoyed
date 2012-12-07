@@ -36,7 +36,6 @@ load \voronoi gl
 var hat, hat-buffer
 !function make-hat
   detail = Math.max 3, (parseInt ($ \detail .value), 10 or 200)
-  console.log "detail: #detail"
 
   hat := new Float32Array (2 + detail) * 3
     &0 = 0 ; &1 = 0 ; &2 = 0
@@ -72,6 +71,7 @@ export draw = !->
   gl.bindBuffer ARRAY_BUFFER, hat-buffer
 
   for points
+    # could've done this in the shader, I know
     uniform gl, \transform, \Matrix4fv, mat4.translate do
       mat4.identity!
       [&pos.0, &pos.1, 0]
@@ -81,6 +81,11 @@ export draw = !->
     gl.uniform3f do
       gl.getUniformLocation gl.program, \color
       &color.0, &color.1, &color.2
+
+    # also could be done in shader
+    gl.uniform2f do
+      gl.getUniformLocation gl.program, \point
+      (&pos.0 + 1) / 2, (&pos.1 + 1) / 2
 
     gl.drawArrays TRIANGLE_FAN, 0, hat.length/3
 
@@ -94,8 +99,69 @@ export draw = !->
 
 add-points 32
 
-reading \image \AsText !->
-  # TODO
+reading \image !->
+  switch it.type
+  case \image/x-portable-pixmap
+    new FileReader
+      &onload = !->
+        tex = read-ppm gl, @result
+
+        gl.activeTexture gl.TEXTURE0
+        gl.bindTexture gl.TEXTURE_2D, tex
+        uniform gl, \texture \1i 0
+
+        gl.uniform1i do
+          gl.getUniformLocation gl.program, \useTexture
+          1
+        $ \img
+          &disabled = false
+          &checked = true
+
+        draw!
+
+      &readAsBinaryString it
+  case <[image/png image/jpeg image/gif]>
+    blob = (window.URL or window.webkitURL)createObjectURL it
+    img = new Image
+      &onload = !->
+        square = document.createElement \canvas
+        square.width = square.height = 512
+        ctx = square.getContext \2d
+        ctx.drawImage this, 0 0 512 512
+        tex = gl.createTexture!
+        gl.pixelStorei UNPACK_FLIP_Y_WEBGL, true
+        gl.bindTexture gl.TEXTURE_2D, tex
+        gl.texImage2D gl.TEXTURE_2D, 0, RGBA, RGBA, UNSIGNED_BYTE, square
+        gl.texParameteri gl.TEXTURE_2D, TEXTURE_MAG_FILTER, NEAREST
+        gl.texParameteri gl.TEXTURE_2D, TEXTURE_MIN_FILTER, NEAREST
+
+        gl.activeTexture gl.TEXTURE0
+        gl.bindTexture gl.TEXTURE_2D, tex
+
+        uniform gl, \texture \1i 0
+
+        gl.uniform1i do
+          gl.getUniformLocation gl.program, \useTexture
+          1
+        $ \img
+          &disabled = false
+          &checked = true
+
+        draw!
+
+      &src = blob
+
+$ \img .addEventListener \click !->
+  gl.uniform1i do
+    gl.getUniformLocation gl.program, \useTexture
+    1
+  draw!
+
+$ \random .addEventListener \click !->
+  gl.uniform1i do
+    gl.getUniformLocation gl.program, \useTexture
+    0
+  draw!
 
 $ \overlay .addEventListener \click !({clientX, clientY}) ->
   {left, top} = @getBoundingClientRect!
@@ -135,4 +201,5 @@ $ \static .addEventListener \click !-> clearTimeout animation
 if $ \animate .checked
   animation := requestAnimationFrame move
 
-$ \detail .addEventListener \input make-hat
+$ \detail .addEventListener \input !-> make-hat!; draw!
+

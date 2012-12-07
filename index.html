@@ -4,7 +4,7 @@
 <title>Voronnoyed: The Happening</title>
 
 <style>
-  input:not(:disabled), button, label { cursor: pointer }
+  input:not(:disabled):not([type=number]), button, label { cursor: pointer }
   #canvases { position: relative; }
   #overlay { cursor: pointer; position: absolute; left: 0; top: 0; }
 </style>
@@ -16,8 +16,8 @@
 <div id=controls>
   <p>Colors:
      <label><input type=radio name=colors id=random checked>Random</label>
-     <label><input type=radio name=colors id=img           >Mosaic</label>
-     (Image: <input type=file id=image>)
+     <label><input type=radio name=colors id=img   disabled>Mosaic</label>
+     (Image, ppm, png, jpg, or gif: <input type=file id=image>)
   <p><button id=add>Add More Points</button>
      <button id=reset>Reset</button>
      , Sites:

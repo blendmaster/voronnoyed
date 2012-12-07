@@ -2,7 +2,7 @@
 original commented source there. */
 (function(){
   "use strict";
-  var log, degrees, radians, $, readPpm, shaderProgram, defer, reading, uniform, bindBuffer, rand, i$, x$, ref$, len$, out$ = typeof exports != 'undefined' && exports || this, slice$ = [].slice;
+  var log, degrees, radians, $, isWhole, proper, readPpm, shaderProgram, defer, reading, uniform, bindBuffer, rand, i$, x$, ref$, len$, out$ = typeof exports != 'undefined' && exports || this, slice$ = [].slice;
   mat4.translation = function(translation){
     return mat4.translate(mat4.identity(), translation);
   };
@@ -19,16 +19,27 @@ original commented source there. */
   out$.$ = $ = function(it){
     return document.getElementById(it);
   };
+  isWhole = function(it){
+    return it % 1 === 0;
+  };
+  proper = function(it){
+    return isWhole(Math.log(it) / Math.log(2));
+  };
   out$.readPpm = readPpm = function(gl, it){
     var ref$, width, height, pixels, data, i, to$, tex;
     ref$ = it.match(/P6\n(\d+) (\d+)\n255\n([\s\S]+)/), width = ref$[1], height = ref$[2], pixels = ref$[3];
     width = parseInt(width, 10);
     height = parseInt(height, 10);
+    if (!(proper(height) && proper(width))) {
+      alert("PPMs must have dimensions that are powers of two!");
+      throw new Error("bad ppm");
+    }
     data = new Uint8Array(width * height * 3);
     for (i = 0, to$ = pixels.length; i < to$; ++i) {
       data[i] = pixels.charCodeAt(i);
     }
     tex = gl.createTexture();
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.bindTexture(gl.TEXTURE_2D, tex);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, width, height, 0, gl.RGB, gl.UNSIGNED_BYTE, data);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -72,16 +83,12 @@ original commented source there. */
   out$.defer = defer = function(t, fn){
     return setTimeout(fn, t);
   };
-  out$.reading = reading = function(id, readerFn, fn){
+  out$.reading = reading = function(id, fn){
     var onchange, x$;
     onchange = function(){
-      var that, x$;
+      var that;
       if (that = this.files[0]) {
-        x$ = new FileReader;
-        x$.onload = function(){
-          fn(this.result);
-        };
-        x$["read" + readerFn](that);
+        fn.call(this, that);
       }
     };
     x$ = $(id);

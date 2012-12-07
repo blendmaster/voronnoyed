@@ -28,7 +28,6 @@ original commented source there. */
   function makeHat(){
     var detail, x$, i, t, step$, to$;
     detail = Math.max(3, parseInt($('detail').value, 10) || 200);
-    console.log("detail: " + detail);
     x$ = hat = new Float32Array((2 + detail) * 3);
     x$[0] = 0;
     x$[1] = 0;
@@ -66,6 +65,7 @@ original commented source there. */
       x$ = ref$[i$];
       uniform(gl, 'transform', 'Matrix4fv', mat4.translate(mat4.identity(), [x$.pos[0], x$.pos[1], 0]));
       gl.uniform3f(gl.getUniformLocation(gl.program, 'color'), x$.color[0], x$.color[1], x$.color[2]);
+      gl.uniform2f(gl.getUniformLocation(gl.program, 'point'), (x$.pos[0] + 1) / 2, (x$.pos[1] + 1) / 2);
       gl.drawArrays(TRIANGLE_FAN, 0, hat.length / 3);
       if ($('show').checked) {
         ctx.beginPath();
@@ -75,7 +75,62 @@ original commented source there. */
     }
   };
   addPoints(32);
-  reading('image', 'AsText', function(){});
+  reading('image', function(it){
+    var x$, blob, y$, img;
+    switch (it.type) {
+    case 'image/x-portable-pixmap':
+      x$ = new FileReader;
+      x$.onload = function(){
+        var tex, x$;
+        tex = readPpm(gl, this.result);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        uniform(gl, 'texture', '1i', 0);
+        gl.uniform1i(gl.getUniformLocation(gl.program, 'useTexture'), 1);
+        x$ = $('img');
+        x$.disabled = false;
+        x$.checked = true;
+        draw();
+      };
+      x$.readAsBinaryString(it);
+      break;
+    case 'image/png':
+    case 'image/jpeg':
+    case 'image/gif':
+      blob = (window.URL || window.webkitURL).createObjectURL(it);
+      y$ = img = new Image;
+      y$.onload = function(){
+        var square, ctx, tex, x$;
+        square = document.createElement('canvas');
+        square.width = square.height = 512;
+        ctx = square.getContext('2d');
+        ctx.drawImage(this, 0, 0, 512, 512);
+        tex = gl.createTexture();
+        gl.pixelStorei(UNPACK_FLIP_Y_WEBGL, true);
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        gl.texImage2D(gl.TEXTURE_2D, 0, RGBA, RGBA, UNSIGNED_BYTE, square);
+        gl.texParameteri(gl.TEXTURE_2D, TEXTURE_MAG_FILTER, NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, TEXTURE_MIN_FILTER, NEAREST);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        uniform(gl, 'texture', '1i', 0);
+        gl.uniform1i(gl.getUniformLocation(gl.program, 'useTexture'), 1);
+        x$ = $('img');
+        x$.disabled = false;
+        x$.checked = true;
+        draw();
+      };
+      y$.src = blob;
+    }
+  });
+  $('img').addEventListener('click', function(){
+    gl.uniform1i(gl.getUniformLocation(gl.program, 'useTexture'), 1);
+    draw();
+  });
+  $('random').addEventListener('click', function(){
+    gl.uniform1i(gl.getUniformLocation(gl.program, 'useTexture'), 0);
+    draw();
+  });
   $('overlay').addEventListener('click', function(arg$){
     var clientX, clientY, ref$, left, top;
     clientX = arg$.clientX, clientY = arg$.clientY;
@@ -116,5 +171,8 @@ original commented source there. */
   if ($('animate').checked) {
     animation = requestAnimationFrame(move);
   }
-  $('detail').addEventListener('input', makeHat);
+  $('detail').addEventListener('input', function(){
+    makeHat();
+    draw();
+  });
 }).call(this);

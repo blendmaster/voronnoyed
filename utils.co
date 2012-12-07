@@ -19,16 +19,22 @@ export radians = -> it * Math.PI / 180
 
 export $ = -> document.getElementById it
 
+is-whole = -> it % 1 is 0
+proper = -> is-whole (Math.log(it)/Math.log(2))
 # the texture from a binary ppm image file
 export read-ppm = (gl, it) ->
   [ , width, height, pixels] = it.match /P6\n(\d+) (\d+)\n255\n([\s\S]+)/
   width = parseInt width, 10
   height = parseInt height, 10
+  unless proper height and proper width
+    alert "PPMs must have dimensions that are powers of two!"
+    throw new Error "bad ppm"
   data = new Uint8Array width * height * 3
   for i til pixels.length
     data[i] = pixels.charCodeAt i
 
   tex = gl.createTexture!
+  gl.pixelStorei gl.UNPACK_FLIP_Y_WEBGL, true
   gl.bindTexture gl.TEXTURE_2D, tex
   gl.texImage2D gl.TEXTURE_2D, 0, gl.RGB, width, height, 0, gl.RGB, gl.UNSIGNED_BYTE, data
   gl.texParameteri gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST
@@ -67,12 +73,9 @@ export shader-program = ({vertex, fragment, uniforms ? {}}) -> !(gl) ->
 export defer = (t, fn) -> setTimeout fn, t
 
 # change handler for a file input
-export reading = (id, reader-fn, fn) ->
+export reading = (id, fn) ->
   onchange = !->
-    if @files.0
-      new FileReader
-        &onload = !-> fn @result
-        &"read#reader-fn" that
+    fn.call this, that if @files.0
 
   $ id
     &addEventListener \change onchange
@@ -115,5 +118,4 @@ if requestAnimationFrame!?
 if requestAnimationFrame!?
   window.requestAnimationFrame = -> setTimeout it, 1000/60
   window.cancelAnimationFrame = clearTimeout
-
 
